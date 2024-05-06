@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'new_medication.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,6 +24,26 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         centerTitle: true,
+      ),
+      body: const Center(
+
+        // Center text
+        child: Text(
+          'No meds today',
+          style: TextStyle(fontSize: 25),
+        ),
+      ),
+
+      // Button
+      floatingActionButton: FloatingActionButton.large(
+        onPressed: () {
+          Navigator.push(
+              context,
+          MaterialPageRoute(builder: (context) => NewMedicationPage()),
+          );
+        },
+        child: const Icon( Icons.add_circle),
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       ),
     );
   }
