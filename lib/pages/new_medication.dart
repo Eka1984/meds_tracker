@@ -89,13 +89,13 @@ class NewMedication extends StatelessWidget {
         children: <Widget>[
           ElevatedButton(
             onPressed: () {
-              // Add save logic here
+              // Add save logic here later
             },
             child: Text('Save'),
         ),
         ElevatedButton(
           onPressed: () {
-            // Add cancel logic here
+            // Add cancel logic here later
             Navigator.pop(context); // Close current page
             },
             child: Text('Cancel'),
