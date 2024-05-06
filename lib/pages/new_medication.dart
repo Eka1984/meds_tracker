@@ -82,6 +82,8 @@ class NewMedication extends StatelessWidget {
             ),
           ),
         ),
+
+        // save and cancel button
         Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
