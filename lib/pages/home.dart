@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:meds_tracker/services/database_helper.dart';
+import 'new_medication.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -25,24 +25,25 @@ class _HomePageState extends State<HomePage> {
         ),
         centerTitle: true,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          try {
-            // Await the future to get the result of the database insertion
-            // int id = await DatabaseHelper.createItem(
-            //     'vitamin c', '1 pill', '02.06.2024', 1);
-            // Once the future completes, the result can be used immediately
-            // List<Map<String, dynamic>> myData = [];
-            // final data = await DatabaseHelper.getItems(1);
-            // myData = data;
-            // print(myData);
-          } catch (e) {
-            // If an error occurs, it will be caught here
-            print('Failed to insert item: $e');
-          }
+      body: const Center(
+
+        // Center text
+        child: Text(
+          'No meds today',
+          style: TextStyle(fontSize: 25),
+        ),
+      ),
+
+      // Button
+      floatingActionButton: FloatingActionButton.large(
+        onPressed: () {
+          Navigator.push(
+              context,
+          MaterialPageRoute(builder: (context) => NewMedicationPage()),
+          );
         },
-        child: Icon(Icons.add),
-        tooltip: 'Add new medication', // Optional: Tooltip text on long press
+        child: const Icon( Icons.add_circle),
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       ),
     );
   }
