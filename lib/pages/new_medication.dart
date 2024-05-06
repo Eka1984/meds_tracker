@@ -25,19 +25,6 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
         centerTitle: true,
       ),
       body: const NewMedication(),
-
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-            TextButton(
-              onPressed: () {},
-              child: const Text('Yes'),
-            ),
-            TextButton(
-              onPressed: () {},
-              child: const Text('No'),
-            ),
-          ],
-
     );
   }
 }
@@ -94,6 +81,24 @@ class NewMedication extends StatelessWidget {
               labelText: 'Enter prescription deadline',
             ),
           ),
+        ),
+        Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          ElevatedButton(
+            onPressed: () {
+              // Add save logic here
+            },
+            child: Text('Save'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            // Add cancel logic here
+            Navigator.pop(context); // Close current page
+            },
+            child: Text('Cancel'),
+          ),
+        ],
         ),
       ],
     );
