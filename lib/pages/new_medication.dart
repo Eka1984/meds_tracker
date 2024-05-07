@@ -87,9 +87,21 @@ class NewMedication extends StatelessWidget {
         Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          ElevatedButton(
+          TextButton(
             onPressed: () {
-              // Add save logic here later
+              showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: const Text('New medication'),
+                  content: const Text('Your medication is saved'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, 'OK'),
+                      child: const Text('OK'),
+              ),
+              ],
+              ),
+              );
             },
             child: Text('Save'),
         ),
@@ -106,3 +118,4 @@ class NewMedication extends StatelessWidget {
     );
   }
 }
+
