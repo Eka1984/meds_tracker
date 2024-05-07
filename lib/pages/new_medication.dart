@@ -85,22 +85,20 @@ class NewMedication extends StatelessWidget {
 
         // save and cancel button
         Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          ElevatedButton(
-            onPressed: () {
-              // Add save logic here
-            },
-            child: Text('Save'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            // Add cancel logic here
-            Navigator.pop(context); // Close current page
-            },
-            child: Text('Cancel'),
-          ),
-        ],
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            ElevatedButton(
+              onPressed: () {},
+              child: Text('Save'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Add cancel logic here
+                Navigator.pop(context); // Close current page
+              },
+              child: Text('Cancel'),
+            ),
+          ],
         ),
       ],
     );
