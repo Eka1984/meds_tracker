@@ -57,65 +57,76 @@ class _HomePageState extends State<HomePage> {
               shrinkWrap: true,
               itemCount: myData.length,
               itemBuilder: (context, index) {
-                return Card(
-                  color: Theme.of(context).colorScheme.surfaceVariant,
-                  margin: const EdgeInsets.all(10),
-                  child: Column(
-                    mainAxisSize: MainAxisSize
-                        .min, // Ensures the column content fits snugly.
-                    children: [
-                      ListTile(
-                        title: Text(myData[index]['medname']),
-                        subtitle: Text(
-                            '10:45'), // Assuming this is a placeholder for a dynamic value.
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            PopupMenuButton<String>(
-                              onSelected: (String result) {
-                                if (result == 'delete') {
-                                  // Handle delete action
-                                } else if (result == 'history') {
-                                  // Handle history action
-                                }
-                              },
-                              itemBuilder: (BuildContext context) =>
-                                  <PopupMenuEntry<String>>[
-                                const PopupMenuItem<String>(
-                                  value: 'delete',
-                                  child: Text('Delete'),
-                                ),
-                                const PopupMenuItem<String>(
-                                  value: 'history',
-                                  child: Text('History'),
-                                ),
-                              ],
-                              icon: Icon(Icons
-                                  .more_vert), // Icon for the menu (three vertical dots)
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Adding the full-width Take button below the ListTile
-                      SizedBox(
-                        width: double
-                            .infinity, // Makes the button expand to fill the card width
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // Handle 'Take' action here, such as marking the medication as taken
-                          },
-                          child: Text('Take'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context)
-                                .colorScheme
-                                .primary, // Button color
-                            foregroundColor: Theme.of(context)
-                                .colorScheme
-                                .onPrimary, // Text color
+                return InkWell(
+                  onTap: () {
+                    // Navigate to the details page when the card is tapped
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              NewMedicationPage()), // Replace DetailsPage with your actual page widget
+                    );
+                  },
+                  child: Card(
+                    color: Theme.of(context).colorScheme.surfaceVariant,
+                    margin: const EdgeInsets.all(10),
+                    child: Column(
+                      mainAxisSize: MainAxisSize
+                          .min, // Ensures the column content fits snugly.
+                      children: [
+                        ListTile(
+                          title: Text(myData[index]['medname']),
+                          subtitle: Text(
+                              '10:45'), // Placeholder for your dynamic value.
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              PopupMenuButton<String>(
+                                onSelected: (String result) {
+                                  if (result == 'delete') {
+                                    // Handle delete action
+                                  } else if (result == 'history') {
+                                    // Handle history action
+                                  }
+                                },
+                                itemBuilder: (BuildContext context) =>
+                                    <PopupMenuEntry<String>>[
+                                  const PopupMenuItem<String>(
+                                    value: 'delete',
+                                    child: Text('Delete'),
+                                  ),
+                                  const PopupMenuItem<String>(
+                                    value: 'history',
+                                    child: Text('History'),
+                                  ),
+                                ],
+                                icon:
+                                    Icon(Icons.more_vert), // Icon for the menu
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    ],
+                        // Full-width Take button
+                        SizedBox(
+                          width: double
+                              .infinity, // Makes the button expand to fill the card width
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // Handle 'Take' action here
+                            },
+                            child: Text('Take'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .primary, // Button color
+                              foregroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimary, // Text color
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
