@@ -21,50 +21,55 @@ class DatabaseHelper {
       // Create Medication table
       //prescdeadline is stored as TEXT in ISO8601 format, although it's called date
       await database.execute("""
-      CREATE TABLE Medication(
-        medicationID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-        medname TEXT,
-        dosage TEXT,
-        prescdeadline TEXT,  
-        active INTEGER
-      )
-      """);
+    CREATE TABLE Medication(
+      medicationID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+      medname TEXT,
+      dosage TEXT,
+      prescdeadline TEXT,  
+      reminders TEXT,
+      interval TEXT,
+      active INTEGER
+    )
+    """);
 
       // Create Reminder table
       // Time can be stored as TEXT in 'HH:MM' format or as ISO8601
       await database.execute("""
-      CREATE TABLE Reminder(
-        reminderID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-        medicationID INTEGER,
-        time TEXT,  
-        active INTEGER,
-        FOREIGN KEY(medicationID) REFERENCES Medication(medicationID)
-      )
-    """);
+    CREATE TABLE Reminder(
+      reminderID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+      medicationID INTEGER,
+      time TEXT,  
+      active INTEGER,
+      FOREIGN KEY(medicationID) REFERENCES Medication(medicationID)
+    )
+  """);
 
       // Create MedicationTaken table
       await database.execute("""
-      CREATE TABLE Medicationtaken(
-        medicationtakenID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-        medicationID INTEGER,
-        time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
-        FOREIGN KEY(medicationID) REFERENCES Medication(medicationID)
-      )
-    """);
+    CREATE TABLE Medicationtaken(
+      medicationtakenID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+      medicationID INTEGER,
+      time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
+      FOREIGN KEY(medicationID) REFERENCES Medication(medicationID)
+    )
+  """);
     } catch (e) {
       print("An error occurred while creating tables: $e");
     }
   }
 
+
   // Create new medication entry
   static Future<int> createItem(String? medname, String? dosage,
-      String? prescdeadline, int? active) async {
+      String? prescdeadline, String? reminders, String? interval, int? active) async {
     try {
       final db = await DatabaseHelper.db();
       final data = {
         'medname': medname,
         'dosage': dosage,
         'prescdeadline': prescdeadline,
+        'reminders': reminders,
+        'interval': interval,
         'active': active
       };
       final id = await db.insert('Medication', data,
@@ -74,7 +79,9 @@ class DatabaseHelper {
       print("An error occurred while creating a new medication: $e");
       throw Exception("Failed to create a new medication");
     }
+
   }
+
 
   //Get items based on active status
   static Future<List<Map<String, dynamic>>> getItems(int active) async {
