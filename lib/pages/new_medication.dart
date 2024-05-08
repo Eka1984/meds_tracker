@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../services/database_helper.dart';
+
 class NewMedicationPage extends StatefulWidget {
   const NewMedicationPage({super.key});
 
@@ -39,99 +41,7 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
         ),
         centerTitle: true,
       ),
-<<<<<<< HEAD
-      body: const NewMedication(),
-    );
-  }
-}
 
-class NewMedication extends StatelessWidget {
-  const NewMedication({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-          child: TextField(
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'Enter a medicine name',
-            ),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-          child: TextField(
-            decoration: const InputDecoration(
-              border: UnderlineInputBorder(),
-              labelText: 'Enter dosage',
-            ),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-          child: TextField(
-            decoration: const InputDecoration(
-              border: UnderlineInputBorder(),
-              labelText: 'Enter reminders',
-            ),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-          child: TextField(
-            decoration: const InputDecoration(
-              border: UnderlineInputBorder(),
-              labelText: 'Enter interval',
-            ),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-          child: TextField(
-            decoration: const InputDecoration(
-              border: UnderlineInputBorder(),
-              labelText: 'Enter prescription deadline',
-            ),
-          ),
-        ),
-
-        // save and cancel button
-        Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          TextButton(
-            onPressed: () {
-              showDialog<String>(
-                context: context,
-                builder: (BuildContext context) => AlertDialog(
-                  title: const Text('New medication'),
-                  content: const Text('Your medication is saved'),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, 'OK'),
-                      child: const Text('OK'),
-              ),
-              ],
-              ),
-              );
-            },
-            child: Text('Save'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            // Add cancel logic here later
-            Navigator.pop(context); // Close current page
-            },
-            child: Text('Cancel'),
-          ),
-        ],
-        ),
-      ],
-=======
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -198,8 +108,28 @@ class NewMedication extends StatelessWidget {
                       1, // Assuming active status is 1 for new medications
                     );
 
-                    // Navigate back to the home screen
-                    Navigator.pop(context);
+                    showDialog<String>(
+                      context: context,
+                      builder: (BuildContext context) => AlertDialog(
+                        title: const Text('New medication'),
+                        content: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('Medication Name: $medName'),
+                            Text('Dosage: $dosage'),
+                            Text('Reminders: $reminders'),
+                            Text('Prescription Deadline: $prescDeadline'),
+                          ],
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, 'OK'),
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      ),
+                    );
                   } catch (e) {
                     // Handle error
                     print("Error saving medication: $e");
@@ -219,7 +149,6 @@ class NewMedication extends StatelessWidget {
           ),
         ],
       ),
->>>>>>> origin/Matilda
     );
   }
 }
