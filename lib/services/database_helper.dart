@@ -88,4 +88,14 @@ class DatabaseHelper {
       throw Exception("Failed to fetch items");
     }
   }
+
+  static Future<void> deleteItem(int medicationId) async {
+    try {
+      final db = await DatabaseHelper.db();
+      await db.delete('Medication', where: 'medicationID = ?', whereArgs: [medicationId]);
+    } catch (e) {
+      print("An error occurred while deleting medication: $e");
+      throw Exception("Failed to delete medication");
+    }
+  }
 }

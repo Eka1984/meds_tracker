@@ -10,10 +10,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  //List with data fetched from the database
   List<Map<String, dynamic>> myData = [];
 
-  //Function refreshing myData variable and the list of meds
   Future<void> _refreshData() async {
     final data = await DatabaseHelper.getItems(1);
     setState(() {
@@ -21,7 +19,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  //Refreshing the list of meds on the first load of the page
   @override
   void initState() {
     super.initState();
@@ -58,13 +55,11 @@ class _HomePageState extends State<HomePage> {
         itemBuilder: (context, index) {
           return InkWell(
             onTap: () {
-              // Navigate to the details page when the card is tapped
               Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => NewMedicationPage()),
               ).then((_) {
-                // Refresh data when returning from NewMedicationPage
                 _refreshData();
               });
             },
@@ -81,9 +76,38 @@ class _HomePageState extends State<HomePage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         PopupMenuButton<String>(
-                          onSelected: (String result) {
+                          onSelected: (String result) async {
                             if (result == 'delete') {
-                              // Handle delete action
+                              bool confirmDelete = await showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text("Confirm Delete"),
+                                    content: Text(
+                                        "Are you sure you want to delete ${myData[index]['medname']}?"),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(
+                                                false), // Cancel
+                                        child: Text("Cancel"),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(
+                                                true), // Delete
+                                        child: Text("Delete"),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+
+                              if (confirmDelete == true) {
+                                await DatabaseHelper.deleteItem(
+                                    myData[index]['medicationID']);
+                                _refreshData();
+                              }
                             } else if (result == 'history') {
                               // Handle history action
                             }
@@ -112,10 +136,12 @@ class _HomePageState extends State<HomePage> {
                       },
                       child: Text('Take'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                        Theme.of(context).colorScheme.primary,
-                        foregroundColor:
-                        Theme.of(context).colorScheme.onPrimary,
+                        backgroundColor: Theme.of(context)
+                            .colorScheme
+                            .primary,
+                        foregroundColor: Theme.of(context)
+                            .colorScheme
+                            .onPrimary,
                       ),
                     ),
                   ),
@@ -133,12 +159,12 @@ class _HomePageState extends State<HomePage> {
             context,
             MaterialPageRoute(builder: (context) => NewMedicationPage()),
           ).then((_) {
-            // Refresh data when returning from NewMedicationPage
             _refreshData();
           });
         },
         child: Icon(Icons.add_circle),
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        backgroundColor:
+        Theme.of(context).colorScheme.primaryContainer,
       ),
     );
   }
