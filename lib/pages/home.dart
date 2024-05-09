@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'new_medication.dart';
 import 'package:meds_tracker/services/database_helper.dart';
+import 'package:meds_tracker/services/ui_helper.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -111,8 +112,16 @@ class _HomePageState extends State<HomePage> {
                           width: double
                               .infinity, // Makes the button expand to fill the card width
                           child: ElevatedButton(
-                            onPressed: () {
-                              // Handle 'Take' action here
+                            onPressed: () async {
+                              int medicationID = myData[index]['medicationID'];
+                              String medname = myData[index]['medname'];
+                              int entryCreated =
+                                  await DatabaseHelper.createTakenEntry(
+                                      medicationID);
+                              if (entryCreated > 0) {
+                                UIHelper.showNotification(
+                                    context, "$medname is taken!");
+                              }
                             },
                             child: Text('Take'),
                             style: ElevatedButton.styleFrom(

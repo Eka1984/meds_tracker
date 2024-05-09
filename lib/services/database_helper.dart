@@ -86,4 +86,20 @@ class DatabaseHelper {
       throw Exception("Failed to fetch items");
     }
   }
+
+  // Create new medicationtaken entry
+  static Future<int> createTakenEntry(int? medicationID) async {
+    try {
+      final db = await DatabaseHelper.db();
+      final data = {
+        'medicationID': medicationID,
+      };
+      final id = await db.insert('Medicationtaken', data,
+          conflictAlgorithm: sql.ConflictAlgorithm.replace);
+      return id;
+    } catch (e) {
+      print("An error occurred while creating a new medicationtaken entry: $e");
+      throw Exception("Failed to create a new medicationtaken entry");
+    }
+  }
 }
