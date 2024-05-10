@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'new_medication.dart';
 import 'package:meds_tracker/services/database_helper.dart';
 import 'package:meds_tracker/services/ui_helper.dart';
+import 'package:meds_tracker/pages/edit_medication.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -59,14 +60,17 @@ class _HomePageState extends State<HomePage> {
               itemCount: myData.length,
               itemBuilder: (context, index) {
                 return InkWell(
-                  onTap: () {
+                  onTap: () async {
                     // Navigate to the details page when the card is tapped
-                    Navigator.push(
+                    final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              NewMedicationPage()), // Replace DetailsPage with your actual page widget
+                              EditMedicationPage(medication: myData[index])),
                     );
+                    if (result == true) {
+                      _refreshData();
+                    }
                   },
                   child: Card(
                     color: Theme.of(context).colorScheme.surfaceVariant,
