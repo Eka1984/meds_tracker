@@ -107,7 +107,8 @@ class DatabaseHelper {
   static Future<void> deleteItem(int medicationId) async {
     try {
       final db = await DatabaseHelper.db();
-      await db.delete('Medication', where: 'medicationID = ?', whereArgs: [medicationId]);
+      await db.delete('Medication',
+          where: 'medicationID = ?', whereArgs: [medicationId]);
     } catch (e) {
       print("An error occurred while deleting medication: $e");
       throw Exception("Failed to delete medication");
@@ -156,7 +157,6 @@ class DatabaseHelper {
     }
   }
 
-
   //Get reminders based on medicationID
   static Future<List<Map<String, dynamic>>> getReminders(
       int medicationID) async {
@@ -186,22 +186,6 @@ class DatabaseHelper {
     } catch (e) {
       print("An error occurred while updating a reminder: $e");
       throw Exception("Failed to update a reminder");
-    }
-  }
-
-  // Create new medicationtaken entry
-  static Future<int> createTakenEntry(int? medicationID) async {
-    try {
-      final db = await DatabaseHelper.db();
-      final data = {
-        'medicationID': medicationID,
-      };
-      final id = await db.insert('Medicationtaken', data,
-          conflictAlgorithm: sql.ConflictAlgorithm.replace);
-      return id;
-    } catch (e) {
-      print("An error occurred while creating a new medicationtaken entry: $e");
-      throw Exception("Failed to create a new medicationtaken entry");
     }
   }
 }
