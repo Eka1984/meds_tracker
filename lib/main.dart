@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meds_tracker/pages/home.dart';
 import 'package:meds_tracker/pages/new_medication.dart';
 import 'package:meds_tracker/pages/history_of_taking.dart';
+import 'package:meds_tracker/pages/Loading.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
       colorScheme: ColorScheme.fromSeed(
         seedColor: Colors.greenAccent,
         brightness:
-            Brightness.light, // Explicitly set brightness for light theme
+        Brightness.light, // Explicitly set brightness for light theme
       ),
       useMaterial3: true,
     );
@@ -37,8 +38,9 @@ class MyApp extends StatelessWidget {
       theme: lightTheme, // Use the light theme
       darkTheme: darkTheme, // Use the dark theme
       themeMode: ThemeMode.system, // Use system theme mode
-      initialRoute: '/', // The initial route when the app starts
+      initialRoute: '/loading', // The initial route when the app starts
       routes: {
+        '/loading': (context) => LoadingPage(),
         '/': (context) => const HomePage(),
         '/second': (context) => const NewMedicationPage(),
         '/third': (context) => const HistoryOfTakingPage(),
