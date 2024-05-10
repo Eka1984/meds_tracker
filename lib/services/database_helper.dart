@@ -76,7 +76,7 @@ class DatabaseHelper {
     }
   }
 
-  //Get items based on active status
+  // Get items based on active status
   static Future<List<Map<String, dynamic>>> getItems(int active) async {
     try {
       final db = await DatabaseHelper.db();
@@ -87,7 +87,34 @@ class DatabaseHelper {
     }
   }
 
-  //Add entry to Reminder table
+  // Create new medicationtaken entry
+  static Future<int> createTakenEntry(int? medicationID) async {
+    try {
+      final db = await DatabaseHelper.db();
+      final data = {
+        'medicationID': medicationID,
+      };
+      final id = await db.insert('Medicationtaken', data,
+          conflictAlgorithm: sql.ConflictAlgorithm.replace);
+      return id;
+    } catch (e) {
+      print("An error occurred while creating a new medicationtaken entry: $e");
+      throw Exception("Failed to create a new medicationtaken entry");
+    }
+  }
+
+  // Delete a medication entry by id
+  static Future<void> deleteItem(int medicationId) async {
+    try {
+      final db = await DatabaseHelper.db();
+      await db.delete('Medication', where: 'medicationID = ?', whereArgs: [medicationId]);
+    } catch (e) {
+      print("An error occurred while deleting medication: $e");
+      throw Exception("Failed to delete medication");
+    }
+  }
+
+  // Add entry to Reminder table
   static Future<int> createReminder(
       int medicationID, String? time, int? active) async {
     try {
@@ -106,6 +133,7 @@ class DatabaseHelper {
     }
   }
 
+  // Update a medication entry by medicationID
   // Update a medication entry by id
   static Future<int> updateItem(int id, String? medname, String? dosage,
       String? prescdeadline, int? active) async {
@@ -127,6 +155,7 @@ class DatabaseHelper {
       throw Exception("Failed to update a medication");
     }
   }
+
 
   //Get reminders based on medicationID
   static Future<List<Map<String, dynamic>>> getReminders(
