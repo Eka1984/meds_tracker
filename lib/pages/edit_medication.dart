@@ -29,8 +29,7 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
   final TextEditingController _medNameController = TextEditingController();
   final TextEditingController _dosageController = TextEditingController();
   final TextEditingController _remindersController = TextEditingController();
-  final TextEditingController _prescDeadlineController =
-      TextEditingController();
+  final TextEditingController _prescDeadlineController = TextEditingController();
 
   @override
   void initState() {
