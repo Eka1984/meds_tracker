@@ -48,7 +48,7 @@ class _HomePageState extends State<HomePage> {
           ? Center(
               child: Text(
                 "No meds today",
-                style: Theme.of(context).textTheme.headline6?.copyWith(
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       color: Theme.of(context).colorScheme.primary,
                     ),
               ),
@@ -137,8 +137,16 @@ class _HomePageState extends State<HomePage> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: () {
-                              // Handle 'Take' action here
+                            onPressed: () async {
+                              int medicationID = myData[index]['medicationID'];
+                              String medname = myData[index]['medname'];
+                              int entryCreated =
+                                  await DatabaseHelper.createTakenEntry(
+                                      medicationID);
+                              if (entryCreated > 0) {
+                                UIHelper.showNotification(
+                                    context, "$medname is taken!");
+                              }
                             },
                             child: Text('Take'),
                             style: ElevatedButton.styleFrom(
