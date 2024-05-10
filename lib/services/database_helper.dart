@@ -86,4 +86,77 @@ class DatabaseHelper {
       throw Exception("Failed to fetch items");
     }
   }
+
+  //Add entry to Reminder table
+  static Future<int> createReminder(
+      int medicationID, String? time, int? active) async {
+    try {
+      final db = await DatabaseHelper.db();
+      final data = {
+        'medicationID': medicationID,
+        'time': time,
+        'active': active,
+      };
+      final id = await db.insert('Reminder', data,
+          conflictAlgorithm: sql.ConflictAlgorithm.replace);
+      return id;
+    } catch (e) {
+      print("An error occurred while creating a new reminder: $e");
+      throw Exception("Failed to create a new reminder");
+    }
+  }
+
+  // Update a medication entry by id
+  static Future<int> updateItem(int id, String? medname, String? dosage,
+      String? prescdeadline, int? active) async {
+    try {
+      final db = await DatabaseHelper.db();
+
+      final data = {
+        'medname': medname,
+        'dosage': dosage,
+        'prescdeadline': prescdeadline,
+        'active': active,
+      };
+
+      final result = await db.update('Medication', data,
+          where: "medicationID = ?", whereArgs: [id]);
+      return result;
+    } catch (e) {
+      print("An error occurred while updating a medication: $e");
+      throw Exception("Failed to update a medication");
+    }
+  }
+
+  //Get reminders based on medicationID
+  static Future<List<Map<String, dynamic>>> getReminders(
+      int medicationID) async {
+    try {
+      final db = await DatabaseHelper.db();
+      return db.query('Reminder',
+          where: "medicationID = ?", whereArgs: [medicationID]);
+    } catch (e) {
+      print("An error occurred while fetching reminders: $e");
+      throw Exception("Failed to fetch reminders");
+    }
+  }
+
+  // Update a reminder entry by id
+  static Future<int> updateReminder(int? id, String? time, int? active) async {
+    try {
+      final db = await DatabaseHelper.db();
+
+      final data = {
+        'time': time,
+        'active': active,
+      };
+
+      final result = await db
+          .update('Reminder', data, where: "reminderID = ?", whereArgs: [id]);
+      return result;
+    } catch (e) {
+      print("An error occurred while updating a reminder: $e");
+      throw Exception("Failed to update a reminder");
+    }
+  }
 }
