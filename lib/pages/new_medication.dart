@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:meds_tracker/services/database_helper.dart';
 
@@ -13,7 +14,29 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
   final TextEditingController _dosageController = TextEditingController();
   final TextEditingController _remindersController = TextEditingController();
   final TextEditingController _prescDeadlineController =
-  TextEditingController();
+      TextEditingController();
+
+  //A list for adding reminder times
+  List<TimeOfDay> _reminders = [];
+
+  void _addNewReminder() async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (pickedTime != null) {
+      setState(() {
+        _reminders.add(pickedTime);
+      });
+    }
+  }
+
+  void _removeReminder(int index) {
+    setState(() {
+      _reminders.removeAt(index);
+    });
+  }
 
   @override
   void dispose() {
@@ -62,16 +85,7 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
               ),
             ),
           ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-            child: TextField(
-              controller: _remindersController,
-              decoration: InputDecoration(
-                border: UnderlineInputBorder(),
-                labelText: 'Enter reminders',
-              ),
-            ),
-          ),
+
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: TextField(
@@ -83,6 +97,33 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
             ),
           ),
 
+          Expanded(
+            child: Column(
+              children: <Widget>[
+                ElevatedButton(
+                  onPressed: _addNewReminder,
+                  child: Text('Add Reminder'),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _reminders.length,
+                    itemBuilder: (context, index) {
+                      final reminder = _reminders[index];
+                      return ListTile(
+                        title: Text(
+                            '${index + 1}. Reminder: ${reminder.format(context)}'),
+                        trailing: IconButton(
+                          icon: Icon(Icons.remove_circle),
+                          onPressed: () => _removeReminder(index),
+                          color: Colors.red,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
 
           // Save and Cancel Buttons
           Row(
@@ -93,17 +134,24 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
                   // Retrieve data from text fields
                   String medName = _medNameController.text;
                   String dosage = _dosageController.text;
-                  String reminders = _remindersController.text;
                   String prescDeadline = _prescDeadlineController.text;
 
                   // Save data to the database
                   try {
-                    await DatabaseHelper.createItem(
+                    int newMedId = await DatabaseHelper.createItem(
                       medName,
                       dosage,
                       prescDeadline,
                       1, // Assuming active status is 1 for new medications
                     );
+
+                    if (newMedId > 0) {
+                      for (var reminder in _reminders) {
+                        String formattedTime = reminder.format(context);
+                        await DatabaseHelper.createReminder(
+                            newMedId, formattedTime, 1);
+                      }
+                    }
 
                     // Navigate back to the home screen
                     Navigator.pop(context);
@@ -126,7 +174,6 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
           ),
         ],
       ),
-
     );
   }
 }
