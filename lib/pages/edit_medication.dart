@@ -14,29 +14,26 @@ class EditMedicationPage extends StatefulWidget {
 class _EditMedicationPageState extends State<EditMedicationPage> {
   List<Map<String, dynamic>> remindersData = [];
 
-  //Function refreshing reminderData variable
+  // Function refreshing reminderData variable
   _refreshData() async {
-    final data =
-        await DatabaseHelper.getReminders(widget.medication['medicationID']);
+    final data = await DatabaseHelper.getReminders(widget.medication['medicationID']);
     setState(() {
       remindersData = data;
       // Join all reminder times with a separator, e.g., ", "
-      _remindersController.text =
-          remindersData.map((reminder) => reminder['time']).join(", ");
+      _remindersController.text = remindersData.map((reminder) => reminder['time']).join(", ");
     });
   }
 
   final TextEditingController _medNameController = TextEditingController();
   final TextEditingController _dosageController = TextEditingController();
   final TextEditingController _remindersController = TextEditingController();
-  final TextEditingController _prescDeadlineController =
-      TextEditingController();
+  final TextEditingController _prescDeadlineController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
 
-    //Refreshing the reminders
+    // Refreshing the reminders
     _refreshData();
 
     // Initialize the text controllers with the medication data passed to the page
@@ -125,7 +122,7 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
                   String dosage = _dosageController.text;
                   String reminders = _remindersController.text;
                   String prescDeadline = _prescDeadlineController.text;
-                  int firstReminderID = remindersData[0]['reminderID'];
+                  int firstReminderID = remindersData.isNotEmpty ? remindersData[0]['reminderID'] : 0;
 
                   // Save data to the database
                   try {
@@ -137,11 +134,13 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
                       1, // Assuming active status is 1 for new medications
                     );
 
-                    await DatabaseHelper.updateReminder(
-                      firstReminderID,
-                      reminders,
-                      1,
-                    );
+                    if (remindersData.isNotEmpty) {
+                      await DatabaseHelper.updateReminder(
+                        firstReminderID,
+                        reminders,
+                        1,
+                      );
+                    }
 
                     // Navigate back to the home screen
                     Navigator.pop(context, true);
