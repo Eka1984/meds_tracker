@@ -101,7 +101,6 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
                       medName,
                       dosage,
                       prescDeadline,
-                      reminders,
                       1, // Assuming active status is 1 for new medications
                     );
 
