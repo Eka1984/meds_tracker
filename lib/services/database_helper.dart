@@ -188,4 +188,17 @@ class DatabaseHelper {
       throw Exception("Failed to update a reminder");
     }
   }
+
+  // Delete a medication entry by id
+  static Future<void> deleteReminder(int medicationId, String time) async {
+    try {
+      final db = await DatabaseHelper.db();
+      await db.delete('Reminder',
+          where: 'medicationID = ? AND time = ?',
+          whereArgs: [medicationId, time]);
+    } catch (e) {
+      print("An error occurred while deleting reminder: $e");
+      throw Exception("Failed to delete reminder");
+    }
+  }
 }
