@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:meds_tracker/services/database_helper.dart';
+import '../services/ui_helper.dart';
 
 class EditMedicationPage extends StatefulWidget {
   final Map<String, dynamic> medication;
@@ -12,31 +14,18 @@ class EditMedicationPage extends StatefulWidget {
 }
 
 class _EditMedicationPageState extends State<EditMedicationPage> {
-  List<Map<String, dynamic>> remindersData = [];
+  List<TimeOfDay> _reminders = [];
 
-  // Function refreshing reminderData variable
-  _refreshData() async {
-    final data = await DatabaseHelper.getReminders(widget.medication['medicationID']);
-    setState(() {
-      remindersData = data;
-      // Join all reminder times with a separator, e.g., ", "
-      _remindersController.text = remindersData.map((reminder) => reminder['time']).join(", ");
-    });
-  }
-
+  //Editing controllers
   final TextEditingController _medNameController = TextEditingController();
   final TextEditingController _dosageController = TextEditingController();
-  final TextEditingController _remindersController = TextEditingController();
-  final TextEditingController _prescDeadlineController = TextEditingController();
+  final TextEditingController _prescDeadlineController =
+      TextEditingController();
 
   @override
   void initState() {
     super.initState();
-
-    // Refreshing the reminders
     _refreshData();
-
-    // Initialize the text controllers with the medication data passed to the page
     _medNameController.text = widget.medication['medname'] ?? '';
     _dosageController.text = widget.medication['dosage'] ?? '';
     _prescDeadlineController.text = widget.medication['prescdeadline'] ?? '';
@@ -46,9 +35,56 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
   void dispose() {
     _medNameController.dispose();
     _dosageController.dispose();
-    _remindersController.dispose();
     _prescDeadlineController.dispose();
     super.dispose();
+  }
+
+  //Function for converting time from db into TimeOfDay format
+  TimeOfDay fromString(String formattedString) {
+    DateFormat format =
+        DateFormat("h:mm a"); // For parsing incoming time strings
+    DateTime dateTime = format.parse(formattedString);
+    return TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
+  }
+
+  //Function for converting TimeOfDay object from the list into H.MM a String for storage in db
+  String toFormattedString(TimeOfDay time) {
+    final now = DateTime.now();
+    final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    return DateFormat("h:mm a").format(dt); // For outgoing time strings
+  }
+
+  //Fetching reminders from db, converting into TimeOfDay objects and putting into _reminders list
+  void _refreshData() async {
+    final data =
+        await DatabaseHelper.getReminders(widget.medication['medicationID']);
+    setState(() {
+      _reminders = data.map((r) => fromString(r['time'])).toList();
+    });
+  }
+
+  //Function that adds new reminder into _reminders list and db
+  void _addNewReminder() async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (pickedTime != null) {
+      setState(() {
+        _reminders.add(pickedTime);
+      });
+      await DatabaseHelper.createReminder(
+          widget.medication['medicationID'], toFormattedString(pickedTime), 1);
+    }
+  }
+
+  //Function that removes a reminder time from the _reminders list and db
+  void _removeReminder(TimeOfDay reminder) {
+    setState(() {
+      _reminders.remove(reminder);
+    });
+    DatabaseHelper.deleteReminder(
+        widget.medication['medicationID'], toFormattedString(reminder));
   }
 
   @override
@@ -68,7 +104,7 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
+        children: [
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: TextField(
@@ -92,16 +128,6 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: TextField(
-              controller: _remindersController,
-              decoration: InputDecoration(
-                border: UnderlineInputBorder(),
-                labelText: 'Enter reminders',
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-            child: TextField(
               controller: _prescDeadlineController,
               decoration: InputDecoration(
                 border: UnderlineInputBorder(),
@@ -109,52 +135,55 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
               ),
             ),
           ),
-
-          // Save and Cancel Buttons
+          Expanded(
+            child: Column(
+              children: <Widget>[
+                ElevatedButton(
+                  onPressed: _addNewReminder,
+                  child: Text('Add Reminder'),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _reminders.length,
+                    itemBuilder: (context, index) {
+                      final reminder = _reminders[index];
+                      return ListTile(
+                        title: Text(
+                            '${index + 1}. Reminder: ${reminder.format(context)}'),
+                        trailing: IconButton(
+                          icon: Icon(Icons.remove_circle),
+                          onPressed: () => _removeReminder(reminder),
+                          color: Colors.red,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
+            children: [
               ElevatedButton(
                 onPressed: () async {
-                  // Retrieve data from text fields
-                  int medicationID = widget.medication['medicationID'];
-                  String medName = _medNameController.text;
-                  String dosage = _dosageController.text;
-                  String reminders = _remindersController.text;
-                  String prescDeadline = _prescDeadlineController.text;
-                  int firstReminderID = remindersData.isNotEmpty ? remindersData[0]['reminderID'] : 0;
-
-                  // Save data to the database
-                  try {
-                    await DatabaseHelper.updateItem(
-                      medicationID,
-                      medName,
-                      dosage,
-                      prescDeadline,
-                      1, // Assuming active status is 1 for new medications
-                    );
-
-                    if (remindersData.isNotEmpty) {
-                      await DatabaseHelper.updateReminder(
-                        firstReminderID,
-                        reminders,
-                        1,
-                      );
-                    }
-
-                    // Navigate back to the home screen
-                    Navigator.pop(context, true);
-                  } catch (e) {
-                    // Handle error
-                    print("Error saving medication: $e");
-                    // Optionally show a snackbar or dialog to inform the user about the error
+                  int result = await DatabaseHelper.updateItem(
+                    widget.medication['medicationID'],
+                    _medNameController.text,
+                    _dosageController.text,
+                    _prescDeadlineController.text,
+                    1,
+                  );
+                  if (result > 0) {
+                    UIHelper.showNotification(
+                        context, "${widget.medication['medname']} is edited!");
                   }
+                  Navigator.pop(context);
                 },
                 child: Text('Save'),
               ),
               ElevatedButton(
                 onPressed: () {
-                  // Navigate back to the home screen without saving
                   Navigator.pop(context);
                 },
                 child: Text('Cancel'),
