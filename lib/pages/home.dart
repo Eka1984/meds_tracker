@@ -77,7 +77,9 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         ListTile(
                           title: Text(myData[index]['medname']),
-                          subtitle: Text(myData[index]['prescdeadline']),
+                          subtitle: Text(myData[index]['prescdeadline'].isEmpty
+                              ? ''
+                              : 'prescription expiry date: ${myData[index]['prescdeadline']}'),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [

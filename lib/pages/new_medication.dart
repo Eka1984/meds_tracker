@@ -137,6 +137,13 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
                   String dosage = _dosageController.text;
                   String prescDeadline = _prescDeadlineController.text;
 
+                  // Validate the medication name
+                  if (medName.isEmpty) {
+                    UIHelper.showNotification(
+                        context, "Please enter a medication name.");
+                    return; // Return to stop execution if validation fails
+                  }
+
                   // Save data to the database
                   try {
                     int newMedId = await DatabaseHelper.createItem(

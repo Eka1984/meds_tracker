@@ -167,6 +167,12 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
             children: [
               ElevatedButton(
                 onPressed: () async {
+                  // Validate the medication name
+                  if (_medNameController.text.isEmpty) {
+                    UIHelper.showNotification(
+                        context, "Please enter a medication name.");
+                    return; // Return to stop execution if validation fails
+                  }
                   int result = await DatabaseHelper.updateItem(
                     widget.medication['medicationID'],
                     _medNameController.text,
