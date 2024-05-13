@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:meds_tracker/services/database_helper.dart';
+import '../services/ui_helper.dart';
 
 class EditMedicationPage extends StatefulWidget {
   final Map<String, dynamic> medication;
@@ -166,13 +167,17 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
             children: [
               ElevatedButton(
                 onPressed: () async {
-                  await DatabaseHelper.updateItem(
+                  int result = await DatabaseHelper.updateItem(
                     widget.medication['medicationID'],
                     _medNameController.text,
                     _dosageController.text,
                     _prescDeadlineController.text,
                     1,
                   );
+                  if (result > 0) {
+                    UIHelper.showNotification(
+                        context, "${widget.medication['medname']} is edited!");
+                  }
                   Navigator.pop(context);
                 },
                 child: Text('Save'),

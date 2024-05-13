@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:meds_tracker/services/database_helper.dart';
+import 'package:meds_tracker/services/ui_helper.dart';
 
 class NewMedicationPage extends StatefulWidget {
   const NewMedicationPage({Key? key}) : super(key: key);
@@ -151,6 +152,7 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
                         await DatabaseHelper.createReminder(
                             newMedId, formattedTime, 1);
                       }
+                      UIHelper.showNotification(context, "$medName is added!");
                     }
 
                     // Navigate back to the home screen
