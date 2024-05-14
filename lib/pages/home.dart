@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'history_of_taking.dart';
 import 'new_medication.dart';
 import 'package:meds_tracker/services/database_helper.dart';
 import 'package:meds_tracker/services/ui_helper.dart';
@@ -116,8 +117,11 @@ class _HomePageState extends State<HomePage> {
                                           myData[index]['medicationID']);
                                       _refreshData();
                                     }
-                                  } else if (result == 'history') {
-                                    // Handle history action
+                                  }else if (result == 'history') {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => HistoryOfTakingPage(medicationID: myData[index]['medicationID'])),
+                                    );
                                   }
                                 },
                                 itemBuilder: (BuildContext context) =>

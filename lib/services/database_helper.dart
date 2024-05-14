@@ -87,22 +87,6 @@ class DatabaseHelper {
     }
   }
 
-  // Create new medicationtaken entry
-  static Future<int> createTakenEntry(int? medicationID) async {
-    try {
-      final db = await DatabaseHelper.db();
-      final data = {
-        'medicationID': medicationID,
-      };
-      final id = await db.insert('Medicationtaken', data,
-          conflictAlgorithm: sql.ConflictAlgorithm.replace);
-      return id;
-    } catch (e) {
-      print("An error occurred while creating a new medicationtaken entry: $e");
-      throw Exception("Failed to create a new medicationtaken entry");
-    }
-  }
-
   // Delete a medication entry by id
   static Future<void> deleteItem(int medicationId) async {
     try {
@@ -199,6 +183,41 @@ class DatabaseHelper {
     } catch (e) {
       print("An error occurred while deleting reminder: $e");
       throw Exception("Failed to delete reminder");
+    }
+  }
+  // Create new medicationtaken entry
+  static Future<int> createTakenEntry(int? medicationID) async {
+    try {
+      final db = await DatabaseHelper.db();
+      final data = {
+        'medicationID': medicationID,
+        'time': DateTime.now().toIso8601String(), // Include current timestamp
+      };
+      final id = await db.insert('Medicationtaken', data,
+          conflictAlgorithm: sql.ConflictAlgorithm.replace);
+      return id;
+    } catch (e) {
+      print("An error occurred while creating a new medicationtaken entry: $e");
+      throw Exception("Failed to create a new medicationtaken entry");
+    }
+  }
+  // Get taken times history for a specific medication, sorted by time (newest first)
+  static Future<List<Map<String, dynamic>>> getMedicationTakenHistory(int medicationID) async {
+    try {
+      final db = await DatabaseHelper.db();
+      return db.query('Medicationtaken', where: "medicationID = ?", whereArgs: [medicationID], orderBy: "time DESC");
+    } catch (e) {
+      print("An error occurred while fetching medication taken history: $e");
+      throw Exception("Failed to fetch medication taken history");
+    }
+  }
+  static Future<List<Map<String, dynamic>>> getMedicationNameById(int medicationID) async {
+    try {
+      final db = await DatabaseHelper.db();
+      return db.query('Medication', where: "medicationID = ?", whereArgs: [medicationID]);
+    } catch (e) {
+      print("An error occurred while fetching medication name: $e");
+      throw Exception("Failed to fetch medication name");
     }
   }
 }
