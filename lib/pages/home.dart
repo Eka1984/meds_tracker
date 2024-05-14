@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'new_medication.dart';
 import 'package:meds_tracker/services/database_helper.dart';
+import 'package:meds_tracker/services/ui_helper.dart';
 import 'package:meds_tracker/pages/edit_medication.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -14,8 +15,7 @@ class _HomePageState extends State<HomePage> {
   //List with data fetched from the database
   List<Map<String, dynamic>> myData = [];
 
-  //Function refreshing myData variable and the list of meds
-  _refreshData() async {
+  Future<void> _refreshData() async {
     final data = await DatabaseHelper.getItems(1);
     setState(() {
       myData = data;
@@ -40,7 +40,6 @@ class _HomePageState extends State<HomePage> {
           style: TextStyle(
             color: Theme.of(context).colorScheme.onPrimary,
             fontSize: 25,
-            //fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
@@ -80,15 +79,45 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         ListTile(
                           title: Text(myData[index]['medname']),
-                          subtitle: Text(
-                              '10:45'), // Placeholder for your dynamic value.
+                          subtitle: Text(myData[index]['prescdeadline'].isEmpty
+                        ? ''
+                        : 'prescription expiry date: ${myData[index]['prescdeadline']}'),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               PopupMenuButton<String>(
-                                onSelected: (String result) {
+                                onSelected: (String result) async {
                                   if (result == 'delete') {
-                                    // Handle delete action
+                                    bool confirmDelete = await showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text("Confirm Delete"),
+                                          content: Text(
+                                              "Are you sure you want to delete ${myData[index]['medname']}?"),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context).pop(
+                                                      false), // Cancel
+                                              child: Text("Cancel"),
+                                            ),
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context).pop(
+                                                      true), // Delete
+                                              child: Text("Delete"),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+
+                                    if (confirmDelete == true) {
+                                      await DatabaseHelper.deleteItem(
+                                          myData[index]['medicationID']);
+                                      _refreshData();
+                                    }
                                   } else if (result == 'history') {
                                     // Handle history action
                                   }
@@ -112,20 +141,26 @@ class _HomePageState extends State<HomePage> {
                         ),
                         // Full-width Take button
                         SizedBox(
-                          width: double
-                              .infinity, // Makes the button expand to fill the card width
+                          width: double.infinity, // Makes the button expand to fill the card width
                           child: ElevatedButton(
-                            onPressed: () {
-                              // Handle 'Take' action here
+                            onPressed: () async {
+                              int medicationID = myData[index]['medicationID'];
+                              String medname = myData[index]['medname'];
+                              int entryCreated =
+                              await DatabaseHelper.createTakenEntry(
+                                  medicationID);
+                              if (entryCreated > 0) {
+                                UIHelper.showNotification(
+                                    context, "$medname is taken!");
+                              }
                             },
                             child: Text('Take'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context)
-                                  .colorScheme
-                                  .primary, // Button color
-                              foregroundColor: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimary, // Text color
+                              backgroundColor:
+                              Theme.of(context).colorScheme.primary, // Button color
+                              foregroundColor:
+                              Theme.of(context).colorScheme.onPrimary, // Text color
+
                             ),
                           ),
                         ),
@@ -142,10 +177,13 @@ class _HomePageState extends State<HomePage> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => NewMedicationPage()),
-          );
+          ).then((_) {
+            _refreshData();
+          });
         },
-        child: const Icon(Icons.add_circle),
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        child: Icon(Icons.add_circle),
+        backgroundColor:
+        Theme.of(context).colorScheme.primaryContainer,
       ),
     );
   }

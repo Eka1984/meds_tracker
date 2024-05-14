@@ -19,14 +19,13 @@ class DatabaseHelper {
   static Future<void> createTables(sql.Database database) async {
     try {
       // Create Medication table
-      // prescdeadline is stored as TEXT in ISO8601 format, although it's called date
+      //prescdeadline is stored as TEXT in ISO8601 format, although it's called date
       await database.execute("""
       CREATE TABLE Medication(
         medicationID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-        medname TEXT, 
+        medname TEXT,
         dosage TEXT,
         prescdeadline TEXT,  
-        reminders TEXT,
         active INTEGER
       )
       """);
@@ -59,14 +58,13 @@ class DatabaseHelper {
 
   // Create new medication entry
   static Future<int> createItem(String? medname, String? dosage,
-      String? prescdeadline, String? reminders, int? active) async {
+      String? prescdeadline, int? active) async {
     try {
       final db = await DatabaseHelper.db();
       final data = {
         'medname': medname,
         'dosage': dosage,
         'prescdeadline': prescdeadline,
-        'reminders': reminders,
         'active': active
       };
       final id = await db.insert('Medication', data,
@@ -105,6 +103,7 @@ class DatabaseHelper {
     }
   }
 
+
   // Delete a medication entry by id
   static Future<void> deleteItem(int medicationId) async {
     try {
@@ -116,6 +115,7 @@ class DatabaseHelper {
       throw Exception("Failed to delete medication");
     }
   }
+
 
   // Add entry to Reminder table
   static Future<int> createReminder(
@@ -165,7 +165,8 @@ class DatabaseHelper {
     try {
       final db = await DatabaseHelper.db();
       return db.query('Reminder',
-          where: "medicationID = ?", whereArgs: [medicationID]);
+          where: "medicationID = ?",
+          whereArgs: [medicationID]);
     } catch (e) {
       print("An error occurred while fetching reminders: $e");
       throw Exception("Failed to fetch reminders");
@@ -204,3 +205,4 @@ class DatabaseHelper {
     }
   }
 }
+
