@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:meds_tracker/services/database_helper.dart';
 import 'package:meds_tracker/services/ui_helper.dart';
+import 'package:meds_tracker/services/notification_helper.dart';
 
 class NewMedicationPage extends StatefulWidget {
   const NewMedicationPage({Key? key}) : super(key: key);
@@ -156,8 +157,10 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
                     if (newMedId > 0) {
                       for (var reminder in _reminders) {
                         String formattedTime = reminder.format(context);
-                        await DatabaseHelper.createReminder(
+                        int reminderID = await DatabaseHelper.createReminder(
                             newMedId, formattedTime, 1);
+                        NotificationHelper.scheduledNotification(reminderID,
+                            "Hello!", "Time to take $medName", reminder);
                       }
                       UIHelper.showNotification(context, "$medName is added!");
                     }
