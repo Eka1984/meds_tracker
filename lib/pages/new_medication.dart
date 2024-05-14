@@ -104,14 +104,14 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
             child: Column(
               children: <Widget>[
                 ElevatedButton(
-                  onPressed: _addNewReminder, // here is function of reminder
+                  onPressed: _addNewReminder,
                   child: Text('Add Reminder'),
                 ),
                 Expanded(
                   child: ListView.builder(
                     itemCount: _reminders.length,
                     itemBuilder: (context, index) {
-                      final reminder = _reminders[index]; // here could be fix for notification
+                      final reminder = _reminders[index];
                       return ListTile(
                         title: Text(
                             '${index + 1}. Reminder: ${reminder.format(context)}'),
