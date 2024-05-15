@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:meds_tracker/services/database_helper.dart';
-import 'package:meds_tracker/services/notification_manager.dart';
 import 'package:meds_tracker/services/ui_helper.dart';
 
 
@@ -21,6 +20,9 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
   //A list for adding reminder times
   List<TimeOfDay> _reminders = [];
 
+
+
+
   void _addNewReminder() async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
@@ -31,7 +33,9 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
       setState(() {
         _reminders.add(pickedTime);
       });
-
+      // Call showNotification method from NotificationManager
+      _notificationManager.showNotification("Title", "Body");
+      print("Notification triggered after adding a reminder");
     }
   }
 
@@ -163,10 +167,14 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
                       for (var reminder in _reminders) {
                         String formattedTime = reminder.format(context);
                         await DatabaseHelper.createReminder(
-                            newMedId, formattedTime, 1);
+                            newMedId,
+                            formattedTime,
+                            1,
+                        );
                       }
                       UIHelper.showNotification(context, "$medName is added!");
                     }
+
 
                     //var _reminders;
                     showDialog<String>(
