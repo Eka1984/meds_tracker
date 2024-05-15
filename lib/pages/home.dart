@@ -118,10 +118,14 @@ class _HomePageState extends State<HomePage> {
                                           myData[index]['medicationID']);
                                       _refreshData();
                                     }
-                                  }else if (result == 'history') {
+                                  } else if (result == 'history') {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => HistoryOfTakingPage(medicationID: myData[index]['medicationID'])),
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              HistoryOfTakingPage(
+                                                  medicationID: myData[index]
+                                                      ['medicationID'])),
                                     );
                                   }
                                 },

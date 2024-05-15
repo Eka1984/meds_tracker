@@ -222,6 +222,7 @@ class DatabaseHelper {
       throw Exception("Failed to fetch an item");
     }
   }
+
   // Create new medicationtaken entry
   static Future<int> createTakenEntry(int? medicationID) async {
     try {
@@ -238,21 +239,28 @@ class DatabaseHelper {
       throw Exception("Failed to create a new medicationtaken entry");
     }
   }
+
   // Get taken times history for a specific medication, sorted by time (newest first)
-  static Future<List<Map<String, dynamic>>> getMedicationTakenHistory(int medicationID) async {
+  static Future<List<Map<String, dynamic>>> getMedicationTakenHistory(
+      int medicationID) async {
     try {
       final db = await DatabaseHelper.db();
-      return db.query('Medicationtaken', where: "medicationID = ?", whereArgs: [medicationID], orderBy: "time DESC");
+      return db.query('Medicationtaken',
+          where: "medicationID = ?",
+          whereArgs: [medicationID],
+          orderBy: "time DESC");
     } catch (e) {
       print("An error occurred while fetching medication taken history: $e");
       throw Exception("Failed to fetch medication taken history");
     }
   }
 
-  static Future<List<Map<String, dynamic>>> getMedicationNameById(int medicationID) async {
+  static Future<List<Map<String, dynamic>>> getMedicationNameById(
+      int medicationID) async {
     try {
       final db = await DatabaseHelper.db();
-      return db.query('Medication', where: "medicationID = ?", whereArgs: [medicationID]);
+      return db.query('Medication',
+          where: "medicationID = ?", whereArgs: [medicationID]);
     } catch (e) {
       print("An error occurred while fetching medication name: $e");
       throw Exception("Failed to fetch medication name");
