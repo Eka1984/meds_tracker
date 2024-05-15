@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meds_tracker/services/notification_helper.dart';
+import 'history_of_taking.dart';
 import 'new_medication.dart';
 import 'package:meds_tracker/services/database_helper.dart';
 import 'package:meds_tracker/services/ui_helper.dart';
@@ -116,7 +117,14 @@ class _HomePageState extends State<HomePage> {
                                       _refreshData();
                                     }
                                   } else if (result == 'history') {
-                                    // Handle history action
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              HistoryOfTakingPage(
+                                                  medicationID: myData[index]
+                                                      ['medicationID'])),
+                                    );
                                   }
                                 },
                                 itemBuilder: (BuildContext context) =>

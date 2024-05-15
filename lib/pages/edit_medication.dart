@@ -77,8 +77,12 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
       });
       int reminderID = await DatabaseHelper.createReminder(
           widget.medication['medicationID'], toFormattedString(pickedTime), 1);
-      NotificationHelper.scheduledNotification(reminderID, "Hello!",
-          "Time to take ${widget.medication['medname']}", pickedTime);
+      NotificationHelper.scheduledNotification(
+          reminderID,
+          "Hello!",
+          "Time to take ${widget.medication['medname']}",
+          pickedTime,
+          widget.medication['medicationID']);
     }
   }
 
@@ -143,7 +147,7 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
               controller: _prescDeadlineController,
               decoration: InputDecoration(
                 border: UnderlineInputBorder(),
-                labelText: 'Enter prescription deadline',
+                labelText: 'Enter prescription deadline (dd.mm.yyyy)',
               ),
             ),
           ),
@@ -185,6 +189,25 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
                         context, "Please enter a medication name.");
                     return; // Return to stop execution if validation fails
                   }
+
+                  if (_prescDeadlineController.text.isNotEmpty) {
+                    //Validate prescription date
+                    bool isInputDate = UIHelper.isValidDateFormat(
+                        _prescDeadlineController.text);
+                    if (!isInputDate) {
+                      UIHelper.showNotification(
+                          context, "Please enter a date in correct format.");
+                      return;
+                    }
+                    TimeOfDay timeForReminder = TimeOfDay(hour: 12, minute: 0);
+                    NotificationHelper.scheduledNotificationForDate(
+                        widget.medication['medicationID'],
+                        'Hello!',
+                        'Prescription for ${widget.medication['medName']} is expiring today',
+                        _prescDeadlineController.text,
+                        timeForReminder);
+                  }
+
                   int result = await DatabaseHelper.updateItem(
                     widget.medication['medicationID'],
                     _medNameController.text,
@@ -196,6 +219,7 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
                     UIHelper.showNotification(
                         context, "${widget.medication['medname']} is edited!");
                   }
+
                   Navigator.pop(context);
                 },
                 child: Text('Save'),

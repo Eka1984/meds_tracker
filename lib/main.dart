@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const HomePage(),
         '/second': (context) => const NewMedicationPage(),
-        '/third': (context) => const HistoryOfTakingPage(),
+        '/third': (context) => const HistoryOfTakingPage(medicationID: 666,),
 
         // Add more routes as needed
       },
