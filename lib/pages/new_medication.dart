@@ -159,8 +159,12 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
                         String formattedTime = reminder.format(context);
                         int reminderID = await DatabaseHelper.createReminder(
                             newMedId, formattedTime, 1);
-                        NotificationHelper.scheduledNotification(reminderID,
-                            "Hello!", "Time to take $medName", reminder);
+                        NotificationHelper.scheduledNotification(
+                            reminderID,
+                            "Hello!",
+                            "Time to take $medName",
+                            reminder,
+                            newMedId);
                       }
                       UIHelper.showNotification(context, "$medName is added!");
                     }

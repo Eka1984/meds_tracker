@@ -2,25 +2,46 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/material.dart';
+import 'package:meds_tracker/services/database_helper.dart';
 
 class NotificationHelper {
   static final _notification = FlutterLocalNotificationsPlugin();
 
-  static init() {
-    _notification.initialize(const InitializationSettings(
-        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-        iOS: DarwinInitializationSettings()));
+  static Future<void> init() async {
+    var initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    var initializationSettingsIOS = DarwinInitializationSettings();
+    var initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsIOS,
+    );
+
+    await _notification.initialize(initializationSettings,
+        onDidReceiveNotificationResponse:
+            (NotificationResponse response) async {
+      if (response.payload != null) {
+        handleAction(response.payload!);
+      }
+    });
+
     tz.initializeTimeZones();
   }
 
-  static scheduledNotification(
-      int id, String title, String body, TimeOfDay time) async {
+  static Future<void> scheduledNotification(int id, String title, String body,
+      TimeOfDay time, int medicationID) async {
     var androidDetails = AndroidNotificationDetails(
         'important notifications', 'Meds Tracker',
-        importance: Importance.max, priority: Priority.high);
+        importance: Importance.max,
+        priority: Priority.high,
+        ongoing: true,
+        actions: <AndroidNotificationAction>[
+          AndroidNotificationAction('take_action', 'Take',
+              showsUserInterface: true, cancelNotification: true),
+          AndroidNotificationAction('skip_action', 'Skip',
+              showsUserInterface: true, cancelNotification: true)
+        ]);
 
-    var iosDetails = const DarwinNotificationDetails();
-
+    var iosDetails = DarwinNotificationDetails();
     var notificationDetails =
         NotificationDetails(android: androidDetails, iOS: iosDetails);
 
@@ -36,7 +57,8 @@ class NotificationHelper {
     // Schedule the notification
     await _notification.zonedSchedule(
         id, title, body, scheduledDate, notificationDetails,
-        androidAllowWhileIdle: true,
+        payload: medicationID.toString(),
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents
             .time, // Ensures it repeats daily at the same time
         uiLocalNotificationDateInterpretation:
@@ -47,85 +69,17 @@ class NotificationHelper {
     await _notification.cancel(id);
   }
 
-  // static scheduledNotification(String title, String body) async {
-  //   var androidDetails = AndroidNotificationDetails(
-  //       'important notifications', 'Meds Tracker',
-  //       importance: Importance.max, priority: Priority.high);
-  //
-  //   var iosDetails = const DarwinNotificationDetails();
-  //
-  //   var notificationDetails =
-  //       NotificationDetails(android: androidDetails, iOS: iosDetails);
-  //
-  //   await _notification.periodicallyShow(
-  //       0, title, body, RepeatInterval.everyMinute, notificationDetails,
-  //       androidAllowWhileIdle: true);
-  // }
-
-  // static scheduledNotification(String title, String body) async {
-  //   var androidDetails = AndroidNotificationDetails(
-  //       'important notifications', 'Meds Tracker',
-  //       importance: Importance.max, priority: Priority.high);
-  //
-  //   var iosDetails = const DarwinNotificationDetails();
-  //
-  //   var notificationDetails =
-  //       NotificationDetails(android: androidDetails, iOS: iosDetails);
-  //
-  //   await _notification.zonedSchedule(
-  //       0,
-  //       title,
-  //       body,
-  //       tz.TZDateTime.now(tz.local).add(const Duration(seconds: 10)),
-  //       notificationDetails,
-  //       uiLocalNotificationDateInterpretation:
-  //           UILocalNotificationDateInterpretation.absoluteTime,
-  //       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle);
-  // }
-
-  // static Future _notificationDetails() async {
-  //   return NotificationDetails(
-  //     android: AndroidNotificationDetails(
-  //       'channel id',
-  //       'channel name',
-  //       // 'channel description',
-  //       importance: Importance.max,
-  //     ),
-  //     // iOS: DarwinNotificationDetails(),
-  //   );
-  // }
-  //
-  // static Future showNotification({
-  //   int id = 0,
-  //   String? title,
-  //   String? body,
-  //   String? payload,
-  // }) async =>
-  //     _notifications.show(
-  //       id,
-  //       title,
-  //       body,
-  //       await _notificationDetails(),
-  //       payload: payload,
-  //     );
-  //
-  // static Future showScheduledNotification({
-  //   int id = 0,
-  //   String? title,
-  //   String? body,
-  //   String? payload,
-  //   required DateTime scheduledDate,
-  // }) async =>
-  //     _notifications.zonedSchedule(
-  //       id,
-  //       title,
-  //       body,
-  //       tz,
-  //       TZDateTime.from(scheduledDate, tz.local),
-  //       await _notificationDetails(),
-  //       payload: payload,
-  //       // androidScheduleMode: true,
-  //       uiLocalNotificationDateInterpretation:
-  //           UILocalNotificationDateInterpretation.absoluteTime,
-  //     );
+  static void handleAction(String payload) async {
+    // Parse medicationID from payload
+    int medicationID = int.parse(payload);
+    // Handle actions based on the payload
+    if (payload.startsWith('take_action')) {
+      print("Taken");
+      // Create a taken entry in the database
+      int newEntry = await DatabaseHelper.createTakenEntry(medicationID);
+      print(newEntry);
+    } else if (payload.startsWith('skip_action')) {
+      print("Skipped");
+    }
+  }
 }

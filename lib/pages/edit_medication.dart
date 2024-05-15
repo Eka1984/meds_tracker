@@ -76,8 +76,12 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
       });
       int reminderID = await DatabaseHelper.createReminder(
           widget.medication['medicationID'], toFormattedString(pickedTime), 1);
-      NotificationHelper.scheduledNotification(reminderID, "Hello!",
-          "Time to take ${widget.medication['medname']}", pickedTime);
+      NotificationHelper.scheduledNotification(
+          reminderID,
+          "Hello!",
+          "Time to take ${widget.medication['medname']}",
+          pickedTime,
+          widget.medication['medicationID']);
     }
   }
 
