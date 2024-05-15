@@ -132,6 +132,13 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               ElevatedButton(
+                onPressed: () {
+                  // Navigate back to the home screen without saving
+                  Navigator.pop(context);
+                },
+                child: Text('Cancel'),
+              ),
+              ElevatedButton(
                 onPressed: () async {
                   // Retrieve data from text fields
                   String medName = _medNameController.text;
@@ -182,8 +189,32 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
                       UIHelper.showNotification(context, "$medName is added!");
                     }
 
-                    // Navigate back to the home screen
-                    Navigator.pop(context);
+                    List<String> reminderTimes = _reminders
+                        .map((reminder) => reminder.format(context))
+                        .toList();
+                    showDialog<String>(
+                      context: context,
+                      builder: (BuildContext context) => AlertDialog(
+                        title: const Text('New medication'),
+                        content: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('Medication Name: $medName'),
+                            Text('Dosage: $dosage'),
+                            Text('Reminders: ${reminderTimes.join(', ')}'),
+                            Text('Prescription Deadline: $prescDeadline'),
+                          ],
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () => Navigator.popUntil(
+                                context, ModalRoute.withName('/')),
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      ),
+                    );
                   } catch (e) {
                     // Handle error
                     print("Error saving medication: $e");
@@ -192,13 +223,7 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
                 },
                 child: Text('Save'),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  // Navigate back to the home screen without saving
-                  Navigator.pop(context);
-                },
-                child: Text('Cancel'),
-              ),
+
             ],
           ),
         ],
