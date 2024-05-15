@@ -35,10 +35,18 @@ class NotificationHelper {
         priority: Priority.high,
         ongoing: true,
         actions: <AndroidNotificationAction>[
-          AndroidNotificationAction('take_action', 'Take',
-              showsUserInterface: true, cancelNotification: true),
-          AndroidNotificationAction('skip_action', 'Skip',
-              showsUserInterface: true, cancelNotification: true)
+          AndroidNotificationAction(
+            'take_action_${medicationID}',
+            'Take',
+            showsUserInterface: true,
+            cancelNotification: true,
+          ),
+          AndroidNotificationAction(
+            'skip_action_${medicationID}',
+            'Skip',
+            showsUserInterface: true,
+            cancelNotification: true,
+          ),
         ]);
 
     var iosDetails = DarwinNotificationDetails();
@@ -57,7 +65,8 @@ class NotificationHelper {
     // Schedule the notification
     await _notification.zonedSchedule(
         id, title, body, scheduledDate, notificationDetails,
-        payload: medicationID.toString(),
+        payload:
+            'take_${medicationID}', // Adjusted payload to include action prefix
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents
             .time, // Ensures it repeats daily at the same time
@@ -70,15 +79,18 @@ class NotificationHelper {
   }
 
   static void handleAction(String payload) async {
-    // Parse medicationID from payload
-    int medicationID = int.parse(payload);
-    // Handle actions based on the payload
-    if (payload.startsWith('take_action')) {
+    // Extract action and medicationID from payload
+    List<String> parts = payload.split('_');
+    String action = parts[0];
+    int medicationID = int.parse(parts.last);
+
+    // Handle actions based on the parsed action type
+    if (action == 'take') {
       print("Taken");
       // Create a taken entry in the database
       int newEntry = await DatabaseHelper.createTakenEntry(medicationID);
       print(newEntry);
-    } else if (payload.startsWith('skip_action')) {
+    } else if (action == 'skip') {
       print("Skipped");
     }
   }

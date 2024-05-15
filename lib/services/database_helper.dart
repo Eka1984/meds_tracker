@@ -223,22 +223,22 @@ class DatabaseHelper {
     }
   }
 
-  // Create new medicationtaken entry
-  static Future<int> createTakenEntry(int? medicationID) async {
-    try {
-      final db = await DatabaseHelper.db();
-      final data = {
-        'medicationID': medicationID,
-        'time': DateTime.now().toIso8601String(), // Include current timestamp
-      };
-      final id = await db.insert('Medicationtaken', data,
-          conflictAlgorithm: sql.ConflictAlgorithm.replace);
-      return id;
-    } catch (e) {
-      print("An error occurred while creating a new medicationtaken entry: $e");
-      throw Exception("Failed to create a new medicationtaken entry");
-    }
-  }
+  // // Create new medicationtaken entry
+  // static Future<int> createTakenEntry(int? medicationID) async {
+  //   try {
+  //     final db = await DatabaseHelper.db();
+  //     final data = {
+  //       'medicationID': medicationID,
+  //       'time': DateTime.now().toIso8601String(), // Include current timestamp
+  //     };
+  //     final id = await db.insert('Medicationtaken', data,
+  //         conflictAlgorithm: sql.ConflictAlgorithm.replace);
+  //     return id;
+  //   } catch (e) {
+  //     print("An error occurred while creating a new medicationtaken entry: $e");
+  //     throw Exception("Failed to create a new medicationtaken entry");
+  //   }
+  // }
 
   // Get taken times history for a specific medication, sorted by time (newest first)
   static Future<List<Map<String, dynamic>>> getMedicationTakenHistory(
