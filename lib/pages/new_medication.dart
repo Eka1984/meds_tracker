@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:meds_tracker/services/database_helper.dart';
 import 'package:meds_tracker/services/ui_helper.dart';
 
-
 class NewMedicationPage extends StatefulWidget {
-  const NewMedicationPage({super.key});
+  const NewMedicationPage({Key? key}) : super(key: key);
 
   @override
   State<NewMedicationPage> createState() => _NewMedicationPageState();
@@ -15,13 +14,11 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
   final TextEditingController _medNameController = TextEditingController();
   final TextEditingController _dosageController = TextEditingController();
   final TextEditingController _remindersController = TextEditingController();
-  final TextEditingController _prescDeadlineController = TextEditingController();
+  final TextEditingController _prescDeadlineController =
+      TextEditingController();
 
   //A list for adding reminder times
   List<TimeOfDay> _reminders = [];
-
-
-
 
   void _addNewReminder() async {
     final TimeOfDay? pickedTime = await showTimePicker(
@@ -33,9 +30,6 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
       setState(() {
         _reminders.add(pickedTime);
       });
-      // Call showNotification method from NotificationManager
-      _notificationManager.showNotification("Title", "Body");
-      print("Notification triggered after adding a reminder");
     }
   }
 
@@ -132,21 +126,10 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
             ),
           ),
 
-
           // Save and Cancel Buttons
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              // cancel button
-              ElevatedButton(
-                onPressed: () {
-                  // Navigate back to the home screen without saving
-                  Navigator.pop(context);
-                },
-                child: Text('Cancel'),
-              ),
-              
-              // save button
               ElevatedButton(
                 onPressed: () async {
                   // Retrieve data from text fields
@@ -159,55 +142,21 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
                     int newMedId = await DatabaseHelper.createItem(
                       medName,
                       dosage,
-                      prescDeadline,                      
-                      1,// Assuming active status is 1 for new medications
+                      prescDeadline,
+                      1, // Assuming active status is 1 for new medications
                     );
 
                     if (newMedId > 0) {
                       for (var reminder in _reminders) {
                         String formattedTime = reminder.format(context);
                         await DatabaseHelper.createReminder(
-                            newMedId,
-                            formattedTime,
-                            1,
-                        );
+                            newMedId, formattedTime, 1);
                       }
                       UIHelper.showNotification(context, "$medName is added!");
                     }
 
-
-                    //var _reminders;
-                    showDialog<String>(
-                      context: context,
-                      builder: (BuildContext context) {
-                        // Map _reminders to a list of strings representing just the time part
-                        List<String> reminderTimes = _reminders
-                            .map((reminder) => reminder.format(context))
-                            .toList();
-                        return AlertDialog(
-                          title: const Text('New medication'),
-                          content: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text('Medication Name: $medName'),
-                              Text('Dosage: $dosage'),
-                              Text('Reminders: ${reminderTimes.join(', ')}'),
-                              Text('Prescription Deadline: $prescDeadline'),
-                            ],
-                          ),
-                          actions: <Widget>[
-                            TextButton(
-                              // return to home page by clicking the OK button in the dialog
-                              onPressed: () =>
-                                  Navigator.popUntil(
-                                      context, ModalRoute.withName('/')),
-                              child: const Text('OK'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
+                    // Navigate back to the home screen
+                    Navigator.pop(context);
                   } catch (e) {
                     // Handle error
                     print("Error saving medication: $e");
@@ -216,7 +165,13 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
                 },
                 child: Text('Save'),
               ),
-
+              ElevatedButton(
+                onPressed: () {
+                  // Navigate back to the home screen without saving
+                  Navigator.pop(context);
+                },
+                child: Text('Cancel'),
+              ),
             ],
           ),
         ],

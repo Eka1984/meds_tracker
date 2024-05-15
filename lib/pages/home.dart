@@ -58,30 +58,26 @@ class _HomePageState extends State<HomePage> {
               itemCount: myData.length,
               itemBuilder: (context, index) {
                 return InkWell(
-                  onTap: () async {
-                    // Navigate to the details page when the card is tapped
-                    final result = await Navigator.push(
+                  onTap: () {
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>
-                              EditMedicationPage(medication: myData[index])),
-                    );
-                    if (result == true) {
+                        builder: (context) =>
+                            EditMedicationPage(medication: myData[index]),
+                      ),
+                    ).then((_) {
                       _refreshData();
-                    }
+                    });
                   },
                   child: Card(
                     color: Theme.of(context).colorScheme.surfaceVariant,
                     margin: const EdgeInsets.all(10),
                     child: Column(
-                      mainAxisSize: MainAxisSize
-                          .min, // Ensures the column content fits snugly.
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         ListTile(
                           title: Text(myData[index]['medname']),
-                          subtitle: Text(myData[index]['prescdeadline'].isEmpty
-                        ? ''
-                        : 'prescription expiry date: ${myData[index]['prescdeadline']}'),
+                          subtitle: Text(myData[index]['prescdeadline']),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -98,14 +94,14 @@ class _HomePageState extends State<HomePage> {
                                           actions: <Widget>[
                                             TextButton(
                                               onPressed: () =>
-                                                  Navigator.of(context).pop(
-                                                      false), // Cancel
+                                                  Navigator.of(context)
+                                                      .pop(false), // Cancel
                                               child: Text("Cancel"),
                                             ),
                                             TextButton(
                                               onPressed: () =>
-                                                  Navigator.of(context).pop(
-                                                      true), // Delete
+                                                  Navigator.of(context)
+                                                      .pop(true), // Delete
                                               child: Text("Delete"),
                                             ),
                                           ],
@@ -133,22 +129,20 @@ class _HomePageState extends State<HomePage> {
                                     child: Text('History'),
                                   ),
                                 ],
-                                icon:
-                                    Icon(Icons.more_vert), // Icon for the menu
+                                icon: Icon(Icons.more_vert),
                               ),
                             ],
                           ),
                         ),
-                        // Full-width Take button
                         SizedBox(
-                          width: double.infinity, // Makes the button expand to fill the card width
+                          width: double.infinity,
                           child: ElevatedButton(
                             onPressed: () async {
                               int medicationID = myData[index]['medicationID'];
                               String medname = myData[index]['medname'];
                               int entryCreated =
-                              await DatabaseHelper.createTakenEntry(
-                                  medicationID);
+                                  await DatabaseHelper.createTakenEntry(
+                                      medicationID);
                               if (entryCreated > 0) {
                                 UIHelper.showNotification(
                                     context, "$medname is taken!");
@@ -157,10 +151,9 @@ class _HomePageState extends State<HomePage> {
                             child: Text('Take'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor:
-                              Theme.of(context).colorScheme.primary, // Button color
+                                  Theme.of(context).colorScheme.primary,
                               foregroundColor:
-                              Theme.of(context).colorScheme.onPrimary, // Text color
-
+                                  Theme.of(context).colorScheme.onPrimary,
                             ),
                           ),
                         ),
@@ -182,8 +175,7 @@ class _HomePageState extends State<HomePage> {
           });
         },
         child: Icon(Icons.add_circle),
-        backgroundColor:
-        Theme.of(context).colorScheme.primaryContainer,
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       ),
     );
   }
