@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:meds_tracker/pages/home.dart';
 import 'package:meds_tracker/pages/new_medication.dart';
 import 'package:meds_tracker/pages/history_of_taking.dart';
+import 'package:meds_tracker/services/notification_helper.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  NotificationHelper.init();
   runApp(const MyApp());
 }
 

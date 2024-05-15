@@ -87,6 +87,22 @@ class DatabaseHelper {
     }
   }
 
+  // Create new medicationtaken entry
+  static Future<int> createTakenEntry(int? medicationID) async {
+    try {
+      final db = await DatabaseHelper.db();
+      final data = {
+        'medicationID': medicationID,
+      };
+      final id = await db.insert('Medicationtaken', data,
+          conflictAlgorithm: sql.ConflictAlgorithm.replace);
+      return id;
+    } catch (e) {
+      print("An error occurred while creating a new medicationtaken entry: $e");
+      throw Exception("Failed to create a new medicationtaken entry");
+    }
+  }
+
   // Delete a medication entry by id
   static Future<void> deleteItem(int medicationId) async {
     try {
@@ -185,6 +201,27 @@ class DatabaseHelper {
       throw Exception("Failed to delete reminder");
     }
   }
+
+  // Get a single ReminderID by medicationID and time
+  static Future<int> getReminderID(int medicationID, String time) async {
+    try {
+      final db = await DatabaseHelper.db();
+      final List<Map<String, dynamic>> result = await db.query('Reminder',
+          columns: ['reminderID'],
+          where: 'medicationID = ? AND time = ?',
+          whereArgs: [medicationID, time],
+          limit: 1);
+
+      if (result.isNotEmpty) {
+        return result.first['reminderID'];
+      } else {
+        throw Exception("No reminder found for the given criteria.");
+      }
+    } catch (e) {
+      print("An error occurred while fetching an item: $e");
+      throw Exception("Failed to fetch an item");
+    }
+  }
   // Create new medicationtaken entry
   static Future<int> createTakenEntry(int? medicationID) async {
     try {
@@ -211,6 +248,7 @@ class DatabaseHelper {
       throw Exception("Failed to fetch medication taken history");
     }
   }
+
   static Future<List<Map<String, dynamic>>> getMedicationNameById(int medicationID) async {
     try {
       final db = await DatabaseHelper.db();

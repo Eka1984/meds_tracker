@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:meds_tracker/services/database_helper.dart';
 import '../services/ui_helper.dart';
+import 'package:meds_tracker/services/notification_helper.dart';
 
 class EditMedicationPage extends StatefulWidget {
   final Map<String, dynamic> medication;
@@ -73,18 +74,32 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
       setState(() {
         _reminders.add(pickedTime);
       });
-      await DatabaseHelper.createReminder(
+      int reminderID = await DatabaseHelper.createReminder(
           widget.medication['medicationID'], toFormattedString(pickedTime), 1);
+      NotificationHelper.scheduledNotification(
+          reminderID,
+          "Hello!",
+          "Time to take ${widget.medication['medname']}",
+          pickedTime,
+          widget.medication['medicationID']);
     }
   }
 
   //Function that removes a reminder time from the _reminders list and db
-  void _removeReminder(TimeOfDay reminder) {
+  void _removeReminder(TimeOfDay reminder) async {
+    String formattedTime = toFormattedString(reminder);
+
+    int reminderID = await DatabaseHelper.getReminderID(
+        widget.medication['medicationID'], formattedTime);
+
+    await NotificationHelper.deleteNotification(reminderID);
+
+    await DatabaseHelper.deleteReminder(
+        widget.medication['medicationID'], formattedTime);
+
     setState(() {
       _reminders.remove(reminder);
     });
-    DatabaseHelper.deleteReminder(
-        widget.medication['medicationID'], toFormattedString(reminder));
   }
 
   @override
