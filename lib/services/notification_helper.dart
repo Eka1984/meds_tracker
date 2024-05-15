@@ -27,6 +27,7 @@ class NotificationHelper {
     tz.initializeTimeZones();
   }
 
+  //Repeating notification for meds
   static Future<void> scheduledNotification(int id, String title, String body,
       TimeOfDay time, int medicationID) async {
     var androidDetails = AndroidNotificationDetails(
@@ -70,6 +71,46 @@ class NotificationHelper {
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents
             .time, // Ensures it repeats daily at the same time
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime);
+  }
+
+  //One time notification for prescription expiry date
+  static Future<void> scheduledNotificationForDate(int id, String title,
+      String body, String dateString, TimeOfDay time) async {
+    // Parse the input date string
+    List<String> dateParts = dateString.split('.');
+    if (dateParts.length != 3) {
+      throw FormatException("Invalid date format");
+    }
+
+    int day = int.parse(dateParts[0]);
+    int month = int.parse(dateParts[1]);
+    int year = int.parse(dateParts[2]);
+
+    DateTime scheduledDateTime =
+        DateTime(year, month, day, time.hour, time.minute);
+
+    // Ensure the date is in the future
+    if (scheduledDateTime.isBefore(DateTime.now())) {
+      throw Exception("Scheduled date is in the past");
+    }
+
+    var androidDetails = AndroidNotificationDetails(
+        'important notifications', 'Meds Tracker',
+        importance: Importance.max, priority: Priority.high, ongoing: true);
+
+    var iosDetails = DarwinNotificationDetails();
+    var notificationDetails =
+        NotificationDetails(android: androidDetails, iOS: iosDetails);
+
+    tz.TZDateTime scheduledDate =
+        tz.TZDateTime.from(scheduledDateTime, tz.local);
+
+    // Schedule the notification
+    await _notification.zonedSchedule(
+        id, title, body, scheduledDate, notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime);
   }

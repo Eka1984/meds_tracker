@@ -94,7 +94,7 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
               controller: _prescDeadlineController,
               decoration: InputDecoration(
                 border: UnderlineInputBorder(),
-                labelText: 'Enter prescription deadline',
+                labelText: 'Enter prescription deadline (dd.mm.yyyy)',
               ),
             ),
           ),
@@ -165,6 +165,26 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
                             "Time to take $medName",
                             reminder,
                             newMedId);
+                      }
+
+                      if (prescDeadline.isNotEmpty) {
+                        //Validate prescription date
+                        bool isInputDate =
+                            UIHelper.isValidDateFormat(prescDeadline);
+                        if (!isInputDate) {
+                          UIHelper.showNotification(context,
+                              "Please enter a date in correct format.");
+                          return;
+                        }
+                        //Set reminder
+                        TimeOfDay timeForReminder =
+                            TimeOfDay(hour: 14, minute: 23);
+                        NotificationHelper.scheduledNotificationForDate(
+                            newMedId,
+                            'Hello!',
+                            'Prescription for $medName is expiring today',
+                            prescDeadline,
+                            timeForReminder);
                       }
                       UIHelper.showNotification(context, "$medName is added!");
                     }
