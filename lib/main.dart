@@ -48,8 +48,10 @@ class MyApp extends StatelessWidget {
 
         // Add more routes as needed
       },
+
       // hide DEBUG sticker
       debugShowCheckedModeBanner: false,
+
     );
   }
 }
