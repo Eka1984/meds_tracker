@@ -1,7 +1,6 @@
 import 'package:sqflite/sqflite.dart' as sql;
 
 class DatabaseHelper {
-
   static Future<sql.Database> db() async {
     try {
       return sql.openDatabase(
@@ -104,7 +103,6 @@ class DatabaseHelper {
     }
   }
 
-
   // Delete a medication entry by id
   static Future<void> deleteItem(int medicationId) async {
     try {
@@ -116,7 +114,6 @@ class DatabaseHelper {
       throw Exception("Failed to delete medication");
     }
   }
-
 
   // Add entry to Reminder table
   static Future<int> createReminder(
@@ -166,8 +163,7 @@ class DatabaseHelper {
     try {
       final db = await DatabaseHelper.db();
       return db.query('Reminder',
-          where: "medicationID = ?",
-          whereArgs: [medicationID]);
+          where: "medicationID = ?", whereArgs: [medicationID]);
     } catch (e) {
       print("An error occurred while fetching reminders: $e");
       throw Exception("Failed to fetch reminders");
@@ -270,5 +266,16 @@ class DatabaseHelper {
       throw Exception("Failed to fetch medication name");
     }
   }
-}
 
+  static Future<List<Map<String, dynamic>>> getRemindersByMedID(
+      int medicationID) async {
+    try {
+      final db = await DatabaseHelper.db();
+      return db.query('Reminder',
+          where: "medicationID = ?", whereArgs: [medicationID]);
+    } catch (e) {
+      print("An error occurred while fetching items: $e");
+      throw Exception("Failed to fetch items");
+    }
+  }
+}

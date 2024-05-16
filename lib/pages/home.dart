@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:meds_tracker/services/notification_helper.dart';
+import '../services/notification_helper.dart';
 import 'history_of_taking.dart';
 import 'new_medication.dart';
 import 'package:meds_tracker/services/database_helper.dart';
@@ -112,6 +112,21 @@ class _HomePageState extends State<HomePage> {
                                     );
 
                                     if (confirmDelete == true) {
+                                      //Deleting reminders of the med
+                                      List<Map<String, dynamic>> medsReminders =
+                                          await DatabaseHelper
+                                              .getRemindersByMedID(myData[index]
+                                                  ['medicationID']);
+                                      if (medsReminders.isNotEmpty) {
+                                        // Iterate through the list and delete each notification
+                                        for (var reminder in medsReminders) {
+                                          int reminderID = reminder[
+                                              'reminderID']; // Adjust this based on your reminder structure
+                                          await NotificationHelper
+                                              .deleteNotification(reminderID);
+                                        }
+                                      }
+
                                       await DatabaseHelper.deleteItem(
                                           myData[index]['medicationID']);
                                       _refreshData();
