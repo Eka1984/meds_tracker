@@ -47,7 +47,7 @@ class DatabaseHelper {
       CREATE TABLE Medicationtaken(
         medicationtakenID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         medicationID INTEGER,
-        time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
+        time DATETIME DEFAULT (DATETIME(CURRENT_TIMESTAMP)),  
         FOREIGN KEY(medicationID) REFERENCES Medication(medicationID)
       )
     """);

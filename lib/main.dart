@@ -4,9 +4,11 @@ import 'package:meds_tracker/pages/new_medication.dart';
 import 'package:meds_tracker/pages/history_of_taking.dart';
 import 'package:meds_tracker/services/notification_helper.dart';
 import 'package:meds_tracker/pages/Loading.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  tz.initializeTimeZones();
   NotificationHelper.init();
   runApp(const MyApp());
 }
@@ -46,7 +48,9 @@ class MyApp extends StatelessWidget {
         '/loading': (context) => LoadingPage(),
         '/': (context) => const HomePage(),
         '/second': (context) => const NewMedicationPage(),
-        '/third': (context) => const HistoryOfTakingPage(medicationID: 666,),
+        '/third': (context) => const HistoryOfTakingPage(
+              medicationID: 666,
+            ),
 
         // Add more routes as needed
       },
