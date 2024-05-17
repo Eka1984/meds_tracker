@@ -43,12 +43,12 @@ class MyApp extends StatelessWidget {
       theme: lightTheme, // Use the light theme
       darkTheme: darkTheme, // Use the dark theme
       themeMode: ThemeMode.system, // Use system theme mode
-      initialRoute: '/loading', // The initial route when the app starts
+      initialRoute: '/', // The initial route when the app starts
       routes: {
-        '/loading': (context) => LoadingPage(),
-        '/': (context) => const HomePage(),
-        '/second': (context) => const NewMedicationPage(),
-        '/third': (context) => const HistoryOfTakingPage(
+        '/': (context) => LoadingPage(),
+        'second': (context) => const HomePage(),
+        '/third': (context) => const NewMedicationPage(),
+        '/fourth': (context) => const HistoryOfTakingPage(
               medicationID: 666,
             ),
 

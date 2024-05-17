@@ -208,8 +208,11 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
                         ),
                         actions: <Widget>[
                           TextButton(
-                            onPressed: () => Navigator.popUntil(
-                                context, ModalRoute.withName('/')),
+                            onPressed: () {
+                              Navigator.pop(context); // Close the dialog
+                              Navigator.pop(
+                                  context, true); // Return to HomePage
+                            },
                             child: const Text('OK'),
                           ),
                         ],
@@ -223,7 +226,6 @@ class _NewMedicationPageState extends State<NewMedicationPage> {
                 },
                 child: Text('Save'),
               ),
-
             ],
           ),
         ],
