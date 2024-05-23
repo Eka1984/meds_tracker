@@ -83,6 +83,7 @@ class _EditMedicationPageState extends State<EditMedicationPage> {
           "Time to take ${widget.medication['medname']}",
           pickedTime,
           widget.medication['medicationID']);
+      print('reminder created');
     }
   }
 

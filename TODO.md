@@ -3,11 +3,13 @@
 ## Tasks
 - [x] GitHub project
 - [x] Pages and router
-- [x] Database creation code
-- [x] Page for adding a new medication 
-- [ ] Medication card
-- [ ] Home page
-- [ ] Code for editing a medication entry
-- [ ] Code for deleting a medication entry
-- [ ] Page with history of taking a medication 
-- [ ] Code for notification
+- [x] Database code
+- [x] Page for adding a new medication
+- [x] Page for editing a medication
+- [x] Medication card
+- [x] Home page
+- [x] Code for making a medication entry
+- [x] Code for editing a medication entry
+- [x] Code for deleting a medication entry
+- [x] Page with history of taking a medication 
+- [x] Code for notification
